@@ -1,7 +1,7 @@
 
 
 import sklearn.decomposition.PCA as PCA 
-
+import numpy as np 
 
 class NoSignalException(Exception):
     pass
