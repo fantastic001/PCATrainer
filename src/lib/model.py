@@ -1,6 +1,6 @@
 
 
-import sklearn.decomposition.PCA as PCA 
+from sklearn.decomposition import PCA
 import numpy as np 
 
 class NoSignalException(Exception):
@@ -23,7 +23,7 @@ class PCAModel(object):
         """
         data: list of dicts with 'label' and 'sample'
         """
-        self.model = PCA(n_component=None)
+        self.model = PCA(n_components=None)
         n_features = len(data[0]["sample"])
         n_samples = len(data)
         self.training = np.zeros([n_samples, n_features])
