@@ -2,6 +2,8 @@
 
 from sklearn.decomposition import PCA
 import numpy as np 
+from random import shuffle
+
 
 class NoSignalException(Exception):
     pass
@@ -54,8 +56,26 @@ class PCAModel(object):
         return (res, mind)
             
 
-    def validate(self, validation_data):
-        pass
+    def validate(self, validation_data, iters):
+        """
+        Does cross validation on data 
+
+        iters: number of iterations for cross validation 
+        validation_data: list of dicts with keys 'label' and 'sample'
+        """
+        n = len(validation_data)
+        correct = 0;
+        k = int(0.1*n)
+        for i in range(iters):
+            shuffle(self.data)
+            self.train(validation_data[:k])
+            for test in validation_data[k:]:
+                l,d = self.classify(test["sample"])
+                if l == test["label"]:
+                    correct = correct + 1
+        return correct / float(iters * len(validation_data[k:])) 
+
+
 
     def project(self, sample):
         """
