@@ -42,10 +42,17 @@ class PCAModel(object):
         pass
 
     def project(self, sample):
-        pass
+        """
+        Projects sample - mean into subspace 
+        """
+        eigens = self.get_eigenvectors()
+        res = []
+        for e in eigens:
+            res.append(e.dot(np.array(sample) - self.get_mean()))
+        return np.array(res)
 
     def get_eigenvectors(self):
-        pass
+        return self.model.components_
 
     def get_mean(self):
         return self.model.mean_
