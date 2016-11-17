@@ -24,6 +24,7 @@ class PCAModel(object):
         data: list of dicts with 'label' and 'sample'
         """
         self.model = PCA(n_components=None)
+        self.data = data
         n_features = len(data[0]["sample"])
         n_samples = len(data)
         self.training = np.zeros([n_samples, n_features])
@@ -34,9 +35,24 @@ class PCAModel(object):
         self.events["trained"](eigenvectors=self.model.components_, eigenvalues=[], mean=self.model.mean_, data=data)
 
     def classify(self, sample):
+        """
+        Classifies given sample
+
+        Returns: (label, distance)
+        """
         if self.model == None:
             raise NotTrainedException()
-        # TODO 
+        dt = self.project(np.array(self.data[0]["sample"])) - self.project(np.array(sample))
+        mind = np.sqrt(dt.dot(dt))
+        res = self.data[0]["label"]
+        for t in self.data:
+            dt = self.project(np.array(t["sample"])) - self.project(np.array(sample))
+            d = np.sqrt(dt.dot(dt))
+            if d < mind:
+                mind = d
+                res = t["label"]
+        return (res, mind)
+            
 
     def validate(self, validation_data):
         pass
