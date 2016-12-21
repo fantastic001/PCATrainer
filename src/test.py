@@ -1,5 +1,6 @@
 from lib import * 
 
+import numpy as np 
 m = PCAModel()
 
 
@@ -23,3 +24,17 @@ validation_data = [
 
 m.train([{"label": "a", "sample": [1, 2, 3]}, {"label": "b", "sample": [5, 5, 5]}])
 
+
+
+from gui import * 
+import sys
+from PyQt5.QtWidgets import QApplication
+
+app = QApplication(sys.argv)
+
+w1 = VectorListWidget([np.array([1, 2, 2]), np.zeros([3])])
+w2 = LabeledVectorListWidget(validation_data)
+
+w1.show()
+w2.show()
+sys.exit(app.exec_())
