@@ -1,5 +1,6 @@
 from lib import * 
 
+import json
 import numpy as np 
 m = PCAModel()
 
@@ -22,7 +23,11 @@ validation_data = [
     {"label": "b", "sample": [10,15,3]},
 ]
 
-m.train([{"label": "a", "sample": [1, 2, 3]}, {"label": "b", "sample": [5, 5, 5]}])
+data = [{"label": "a", "sample": [1, 2, 3]}, {"label": "b", "sample": [5, 5, 5]}]
+
+f = open("/home/stefan/train.json", "w")
+f.write(json.dumps(data))
+f.close()
 
 
 
@@ -32,9 +37,7 @@ from PyQt5.QtWidgets import QApplication
 
 app = QApplication(sys.argv)
 
-w1 = VectorListWidget([np.array([1, 2, 2]), np.zeros([3])])
-w2 = LabeledVectorListWidget(validation_data)
+window = MainWindow(m)
+window.show()
 
-w1.show()
-w2.show()
 sys.exit(app.exec_())
