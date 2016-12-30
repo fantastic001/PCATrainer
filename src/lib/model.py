@@ -3,7 +3,7 @@
 from sklearn.decomposition import PCA
 import numpy as np 
 from random import shuffle
-
+import json
 
 class NoSignalException(Exception):
     pass
@@ -92,6 +92,37 @@ class PCAModel(object):
 
     def get_mean(self):
         return self.model.mean_
+
+    def save(self, path):
+        eigen = self.get_eigenvectors()
+        mean = self.get_mean()
+        data = self.data 
+        json_eigen = []
+        json_mean = [] 
+        json_data = []
+        for e in eigen:
+            curr = []
+            for elem in e:
+                curr.append(elem)
+            json_eigen.append(curr)
+        for e in mean:
+            json_mean.append(e)
+        for d in data:
+            t = {}
+            t["label"] = d["label"]
+            t["sample"] = [] 
+            for e in d["sample"]:
+                t["sample"].append(e)
+            json_data.append(d)
+        s = json.dumps({"eigevectors": json_eigen, "mean": json_mean, "data": json_data})
+        f = open(path, "w")
+        f.write(s)
+        f.close()
+
+    def restore(self, path):
+        f = open(path)
+        data = json.loads(f.read())
+        self.train(data["data"])
 
     def connect(self, event, fun):
         """
