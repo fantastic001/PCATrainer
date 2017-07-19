@@ -8,17 +8,28 @@ from .LabeledVectorListWidget import *
 
 import json
 
+from gui.dialogs import * 
+from lib.dataset_generators import * 
+
+from .generator_action import * 
+
 class MainWindow(QWidget):
     
+
     def __init__(self, model):
         super(MainWindow, self).__init__()
+        
+        self.actions = [
+            GeneratorAction(self, "Load data from JSON file", JSONDatasetGenerator, QtSelectFileDialog),
+            GeneratorAction(self, "Load data from directory structure", DirectoryDatasetGenerator, QtSelectDirectoryDialog)
+        ]
+
         self.ew = VectorListWidget()
         self.tw = LabeledVectorListWidget()
         
         self.model = model
         self.model.connect("trained", self.trained)
         btn_train = QPushButton("Train model")
-        btn_train.clicked.connect(self.train)
         btn_save = QPushButton("Save this model")
         btn_save.clicked.connect(self.save)
         btn_restore = QPushButton("Restore saved model")
@@ -33,14 +44,16 @@ class MainWindow(QWidget):
         layout.addWidget(btn_save)
         layout.addWidget(btn_restore)
         self.setLayout(layout)
+
+        menu = QMenu()
+
+        for action in self.actions:
+            action.setModel(self.model)
+            menu.addAction(action)
+        btn_train.setMenu(menu)
+
         self.repaint()
 
-    def train(self):
-        filename, other = QFileDialog.getOpenFileName(self, "Select JSON file with data")
-        f = open(filename)
-        source = f.read()
-        self.model.train(json.loads(source))
-        
     def trained(self, **kwargs):
         self.ew.update(kwargs["eigenvectors"])
         self.tw.update(kwargs["data"])
