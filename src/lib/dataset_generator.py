@@ -10,6 +10,6 @@ class DatasetGenerator(object):
 
     def getData(self):
         """
-        Returns list of dicts conisting of 'label' and 'sample' keys
+        Returns list of DataSample objects
         """
         pass

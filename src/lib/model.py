@@ -5,6 +5,8 @@ import numpy as np
 from random import shuffle
 import json
 
+from .data_sample import * 
+
 class NoSignalException(Exception):
     pass
 
@@ -23,16 +25,16 @@ class PCAModel(object):
 
     def train(self, data):
         """
-        data: list of dicts with 'label' and 'sample'
+        data: list of DataSample objects
         """
         self.model = PCA(n_components=None)
         self.data = data
-        n_features = len(data[0]["sample"])
+        n_features = len(data[0].getSample())
         n_samples = len(data)
         self.training = np.zeros([n_samples, n_features])
         for i in range(n_samples):
             for j in range(n_features):
-                self.training[i,j] = data[i]["sample"][j]
+                self.training[i,j] = data[i].getSample()[j]
         self.model.fit(self.training)
         self.events["trained"](eigenvectors=self.model.components_, eigenvalues=[], mean=self.model.mean_, data=data)
 
@@ -40,19 +42,21 @@ class PCAModel(object):
         """
         Classifies given sample
 
+        sample: DataSample object
+
         Returns: (label, distance)
         """
         if self.model == None:
             raise NotTrainedException()
-        dt = self.project(np.array(self.data[0]["sample"])) - self.project(np.array(sample))
+        dt = self.project(np.array(self.data[0].getSample())) - self.project(np.array(sample.getSample()))
         mind = np.sqrt(dt.dot(dt))
-        res = self.data[0]["label"]
+        res = self.data[0].getLabel()
         for t in self.data:
-            dt = self.project(np.array(t["sample"])) - self.project(np.array(sample))
+            dt = self.project(np.array(t.getSample())) - self.project(np.array(sample.getSample()))
             d = np.sqrt(dt.dot(dt))
             if d < mind:
                 mind = d
-                res = t["label"]
+                res = t.getLabel()
         return (res, mind)
             
 
@@ -61,7 +65,7 @@ class PCAModel(object):
         Does cross validation on data 
 
         iters: number of iterations for cross validation 
-        validation_data: list of dicts with keys 'label' and 'sample'
+        validation_data: list of DataSample objects
         """
         n = len(validation_data)
         correct = 0;
@@ -70,8 +74,8 @@ class PCAModel(object):
             shuffle(self.data)
             self.train(validation_data[:k])
             for test in validation_data[k:]:
-                l,d = self.classify(test["sample"])
-                if l == test["label"]:
+                l,d = self.classify(test.getSample())
+                if l == test.getLabel():
                     correct = correct + 1
         return correct / float(iters * len(validation_data[k:])) 
 
@@ -79,8 +83,12 @@ class PCAModel(object):
 
     def project(self, sample):
         """
+        
+        sample: DataSample object
+
         Projects sample - mean into subspace 
         """
+        sample = sample.getSample()
         eigens = self.get_eigenvectors()
         res = []
         for e in eigens:
@@ -108,12 +116,7 @@ class PCAModel(object):
         for e in mean:
             json_mean.append(e)
         for d in data:
-            t = {}
-            t["label"] = d["label"]
-            t["sample"] = [] 
-            for e in d["sample"]:
-                t["sample"].append(e)
-            json_data.append(d)
+            json_data.append(d.toDict())
         s = json.dumps({"eigevectors": json_eigen, "mean": json_mean, "data": json_data})
         f = open(path, "w")
         f.write(s)
@@ -122,7 +125,10 @@ class PCAModel(object):
     def restore(self, path):
         f = open(path)
         data = json.loads(f.read())
-        self.train(data["data"])
+        samples = [] 
+        for d in data["data"]:
+            samples.append(DataSample.fromDict(d))
+        self.train(samples)
 
     def connect(self, event, fun):
         """

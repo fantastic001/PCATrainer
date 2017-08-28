@@ -20,8 +20,8 @@ class LabeledVectorListWidget(QWidget):
         self.label.setText("Count: " + str(len(data)))
         self.items.clear()
         for d in data:
-            v = d["sample"]
-            label = d["label"]
+            v = d.getSample()
+            label = d.getLabel()
             name = "[ "
             for e in v:
                 name += str(e) + " "

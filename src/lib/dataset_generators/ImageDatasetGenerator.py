@@ -1,6 +1,8 @@
 
 from ..dataset_generator import * 
 
+from .. import DataSample
+
 import cv2 
 import os 
 
@@ -13,6 +15,5 @@ class ImageDatasetGenerator(DatasetGenerator):
             for imgname in os.listdir("%s/%s" % (path, label)):
                 image = cv2.imread("%s/%s/%s" % (path, label, imgname))
                 dst = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-                sample = dst.reshape(dst.shape[0] * dst.shape[1])
-                res.append({"label": label, "sample": sample})
+                res.append(ImageSample(dst, label))
         return res

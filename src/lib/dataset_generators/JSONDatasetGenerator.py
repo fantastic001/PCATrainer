@@ -2,6 +2,8 @@
 
 from .. import DatasetGenerator 
 
+from .. import DataSample
+
 import json 
 
 class JSONDatasetGenerator(DatasetGenerator):
@@ -11,4 +13,7 @@ class JSONDatasetGenerator(DatasetGenerator):
         f = open(params.get("filename", "data.json"))
         source = f.read()
         data = json.loads(source)["data"]
-        return data
+        res = [] 
+        for entry in data:
+            res.append(DataSample.fromDict(entry))
+        return res

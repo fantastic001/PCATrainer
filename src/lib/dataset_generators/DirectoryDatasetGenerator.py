@@ -1,6 +1,8 @@
 
 from .. import DatasetGenerator 
 
+from .. import DataSample
+
 import os 
 
 class DirectoryDatasetGenerator(DatasetGenerator):
@@ -14,5 +16,5 @@ class DirectoryDatasetGenerator(DatasetGenerator):
                 sample = [] 
                 for line in f:
                     sample.append(float(line))
-                res.append({"sample": sample, "label": label})
+                res.append(DataSample(sample, label))
         return res
