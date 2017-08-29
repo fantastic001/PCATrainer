@@ -1,5 +1,5 @@
 
-from gui.dialogs import * 
+from PCATrainer.gui.dialogs import * 
 
 class GeneratorAction(QAction):
 

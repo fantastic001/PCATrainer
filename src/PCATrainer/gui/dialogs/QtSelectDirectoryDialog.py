@@ -1,5 +1,5 @@
 
-from lib import Dialog 
+from PCATrainer.lib import Dialog 
 
 
 from PyQt5.QtWidgets import * 

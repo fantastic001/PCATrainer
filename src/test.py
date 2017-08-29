@@ -1,4 +1,4 @@
-from lib import * 
+from PCATrainer.lib import * 
 
 import json
 import numpy as np 
@@ -31,7 +31,7 @@ f.close()
 
 
 
-from gui import * 
+from PCATrainer.gui import * 
 import sys
 from PyQt5.QtWidgets import QApplication
 

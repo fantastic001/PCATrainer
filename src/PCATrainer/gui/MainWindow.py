@@ -8,10 +8,12 @@ from .LabeledVectorListWidget import *
 
 import json
 
-from gui.dialogs import * 
-from lib.dataset_generators import * 
+from PCATrainer.gui.dialogs import * 
+from .representations import * 
+from PCATrainer.lib.dataset_generators import * 
 
 from .generator_action import * 
+from .representation_action import * 
 
 class MainWindow(QWidget):
     
@@ -31,6 +33,7 @@ class MainWindow(QWidget):
         self.model = model
         self.model.connect("trained", self.trained)
         btn_train = QPushButton("Train model")
+        btn_visualize = QPushButton("Visualize data and model")
         btn_save = QPushButton("Save this model")
         btn_save.clicked.connect(self.save)
         btn_restore = QPushButton("Restore saved model")
@@ -42,11 +45,15 @@ class MainWindow(QWidget):
         layout.addWidget(QLabel("Training data"))
         layout.addWidget(self.tw)
         layout.addWidget(btn_train)
+        layout.addWidget(btn_visualize)
         layout.addWidget(btn_save)
         layout.addWidget(btn_restore)
         self.setLayout(layout)
 
         menu = QMenu()
+
+        self.representationMenu = QMenu()
+        btn_visualize.setMenu(self.representationMenu)
 
         for action in self.actions:
             action.setModel(self.model)
@@ -58,6 +65,14 @@ class MainWindow(QWidget):
     def trained(self, **kwargs):
         self.ew.update(kwargs["eigenvectors"])
         self.tw.update(kwargs["data"])
+        data = kwargs["data"]
+        
+        representations = [
+            RepresentationAction(self, "2D projection", PlaneRepresentation(), self.model, data)
+        ]
+        for representation in representations:
+            self.representationMenu.addAction(representation)
+
 
     def save(self):
         filename, other = QFileDialog.getSaveFileName(self, "Select Location to save model")
