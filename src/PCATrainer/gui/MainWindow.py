@@ -23,6 +23,7 @@ class MainWindow(QWidget):
         
         self.actions = [
             GeneratorAction(self, "Load data from JSON file", JSONDatasetGenerator, QtSelectFileDialog),
+            GeneratorAction(self, "Load data from CSV file", CSVDatasetGenerator, QtSelectFileDialog),
             GeneratorAction(self, "Load data from directory structure", DirectoryDatasetGenerator, QtSelectDirectoryDialog),
             GeneratorAction(self, "Load data from directory structure with images", ImageDatasetGenerator, QtSelectDirectoryDialog)
         ]
